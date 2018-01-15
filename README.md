@@ -1,4 +1,4 @@
-# Project
+# Aligining subs and DVS text
 
 The 2 IMDB_.py files take user and critic reviews from IMDB for one movie and put them into a .txt file
 
