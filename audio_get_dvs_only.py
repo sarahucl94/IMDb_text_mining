@@ -1,11 +1,15 @@
-‘’’Author: Sarah Aliko. This code modifies the text file containing subtitles and timings of subtitles obtained online. Then the timings are grouped into pairs (in the format start:end), but rather than use the start:end of subtitles, it uses the inter-subtitle timings to estimate DVS timings. Then it accesses the audio file of the movie (mono audio channel) and splits the DVS timings out of the audio, merging them into a new audio file in “.wav” format.’’’
+#Author: Sarah Aliko. This code modifies the text file containing subtitles and timings of subtitles obtained online.
+# Then the timings are grouped into pairs (in the format start:end), but rather than use the start:end of subtitles,
+# it uses the inter-subtitle timings to estimate DVS timings. Then it accesses the audio file of the movie (mono audio channel)
+# and splits the DVS timings out of the audio, merging them into a new audio file in .wav format.
+#Save subs as Adobe txt, but need to modify text (remove single digits at start of each line and add last time point of audio
 
 #Open subtitle file – contains both timings and text
 #open new text file to write timings of subs only and remove text
 with open("/Volumes/Macintosh HD/Users/sarah/Downloads/subs_timings.txt", "r+") as file:
     with open("/Volumes/Macintosh HD/Users/sarah/Downloads/subs_part3_times.txt", "w+") as a:
         for line in file.read().split():
-            result = ''.join(i for i in line if i.isdigit() or i== ':' or i=='.')
+            result = ''.join(i for i in line if i.isdigit() or i== ';') #: or .
             new_list = [result]
             a.write(repr(new_list))
     a.close()
@@ -45,7 +49,6 @@ fs1, y1 = scipy.io.wavfile.read('/Volumes/Macintosh HD/Users/sarah/Downloads/aud
 time_str = open('/Volumes/Macintosh HD/Users/sarah/Downloads/subs_part3_times.txt').read().replace(' ', "").split(',')
 
 
-
 #write the timings as seconds instead of hh:mm:ss format
 #select the inter-subtitle timings (ie the ones that should have DVS audio)
 def obtain_sec(time_str):
@@ -55,18 +58,20 @@ def obtain_sec(time_str):
         lst.append(element)
     time2 = [i.split() for i in lst]
     flat_time = [item for sublist in time2 for item in sublist if item is not '.']
+    flat_time = [s.replace(";", ".") for s in flat_time]
     for timing in flat_time:
         c = int(timing[0:2]) * 3600 + int(timing[3:5]) * 60 + float(timing[6:11])
         subs.append(c)
-        bits = [subs[x:x + 2] for x in range(1, len(subs), 3)]
+    bits = [subs[x:x + 2] for x in range(1, len(subs), 2)]
     return (bits)
 
 
 
 
 #split audio file based on timings above and merge them into new audio file
-subtitles = obtain_sec(time_str)
-l1 = np.array(subtitles)
+dvs = obtain_sec(time_str)
+l1 = np.array(dvs)
+print(l1)
 l1 = np.ceil(l1*fs1)
 newWavFileAsList = []
 for elem in l1:
