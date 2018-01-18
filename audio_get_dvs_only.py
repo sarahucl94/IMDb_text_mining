@@ -22,6 +22,7 @@ with open("/Volumes/Macintosh HD/Users/sarah/Downloads/subs_timings.txt", "r+") 
 
 #modify subtitle file to adapt format for analysis
 #removes characters that are not timings (eg. commas, dots, brakets)
+
 def new():
     with open("/Volumes/Macintosh HD/Users/sarah/Downloads/subs_part3_times.txt", "r+") as a:
         for line in a.read().split():
@@ -54,6 +55,8 @@ time_str = open('/Volumes/Macintosh HD/Users/sarah/Downloads/subs_part3_times.tx
 
 #write the timings as seconds instead of hh:mm:ss format
 #select the inter-subtitle timings (ie the ones that should have DVS audio)
+#print the start:end timings of the dvs audio into a file
+
 def obtain_sec(time_str):
     lst=[]
     subs=[]
@@ -72,14 +75,8 @@ def obtain_sec(time_str):
     new_file.close()
 
 
-    # for j in range(1, len(subs)):
-    # print(j)
-    # for i in range(0, len(subs)-1):
-    #     print(i)
-    #     new = [subs[j] - subs[i]]
-    #     i += 1
-    #     j += 1
-    # print(new)
+#open the dvs timings file and calculate the difference between each start:end pair
+#this means calculate (end-start) = duration of each dvs audio chunk
 
 dvs_interval = open("dvs_timings_and_duration.txt").read().replace("[", '')
 dvs_interval = dvs_interval.replace("]",'')
@@ -100,9 +97,21 @@ def duration(dvs_interval):
             i += 2
     return intervals
 
-
 durations = duration(dvs_interval)
-#split audio file based on timings above and merge them into new audio file
+print(durations)
+
+start_times = []
+i = 0
+for values in dvs_interval:
+    while i < len(dvs_interval):
+        start_times.append(dvs_interval[i])
+        i += 2
+print(start_times)
+
+
+
+#split audio file based on dvs timing intervals above and merge them into new audio file
+
 dvs = obtain_sec(time_str)
 l1 = np.array(dvs)
 l1 = np.ceil(l1*fs1)
