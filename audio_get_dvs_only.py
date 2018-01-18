@@ -6,6 +6,11 @@
 
 #Open subtitle file – contains both timings and text
 #open new text file to write timings of subs only and remove text
+
+import decimal
+import numpy as np
+import scipy.io.wavfile
+
 with open("/Volumes/Macintosh HD/Users/sarah/Downloads/subs_timings.txt", "r+") as file:
     with open("/Volumes/Macintosh HD/Users/sarah/Downloads/subs_part3_times.txt", "w+") as a:
         for line in file.read().split():
@@ -41,8 +46,6 @@ new()
 #if audio channel is not originally mono, modify it using ffmpeg command
 #in the terminal.
 
-import numpy as np
-import scipy.io.wavfile
 fs1, y1 = scipy.io.wavfile.read('/Volumes/Macintosh HD/Users/sarah/Downloads/audio_mono.wav')
 
 
@@ -63,15 +66,45 @@ def obtain_sec(time_str):
         c = int(timing[0:2]) * 3600 + int(timing[3:5]) * 60 + float(timing[6:11])
         subs.append(c)
     bits = [subs[x:x + 2] for x in range(1, len(subs), 2)]
+    with open("dvs_timings_and_duration.txt", "w") as new_file:
+        new_file.write(str(bits))
     return (bits)
+    new_file.close()
 
 
+    # for j in range(1, len(subs)):
+    # print(j)
+    # for i in range(0, len(subs)-1):
+    #     print(i)
+    #     new = [subs[j] - subs[i]]
+    #     i += 1
+    #     j += 1
+    # print(new)
+
+dvs_interval = open("dvs_timings_and_duration.txt").read().replace("[", '')
+dvs_interval = dvs_interval.replace("]",'')
+dvs_interval = dvs_interval.replace(",",'')
+dvs_interval = dvs_interval.replace("'",'').split()
+
+def duration(dvs_interval):
+    l = []
+    for element in dvs_interval:
+        l.append(element)
+    i = 0
+    j = 1
+    intervals = []
+    while i < len(l):
+        while j < len(l):
+            intervals.append(decimal.Decimal(l[j]) - decimal.Decimal(l[i]))
+            j += 2
+            i += 2
+    return intervals
 
 
+durations = duration(dvs_interval)
 #split audio file based on timings above and merge them into new audio file
 dvs = obtain_sec(time_str)
 l1 = np.array(dvs)
-print(l1)
 l1 = np.ceil(l1*fs1)
 newWavFileAsList = []
 for elem in l1:
@@ -85,5 +118,5 @@ for elem in l1:
 
 
 newWavFile = np.array(newWavFileAsList)
-scipy.io.wavfile.write("/Volumes/Macintosh HD/Users/sarah/Downloads/dvs_audio_only.wav", fs1, newWavFile)
+scipy.io.wavfile.write("dvs_audio_only.wav", fs1, newWavFile)
 
