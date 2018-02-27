@@ -7,11 +7,13 @@
 #Open subtitle file – contains both timings and text
 #open new text file to write timings of subs only and remove text
 
-import decimal
 import numpy as np
 import scipy.io.wavfile
+from scipy.spatial.distance import euclidean
 import re
 import decimal
+from fastdtw import fastdtw
+
 
 with open("subs.txt", "r+") as file:
     with open("subs_part3_times.txt", "w+") as a:
@@ -158,11 +160,6 @@ with open('data.txt', 'r+') as file:
         new_list.append(decimal.Decimal(element))
     print(new_list)
 
-i = 0
-j = 0
-correlation = []
-while j < len(durations):
-    while i < len(new_list):
-        if new_list[i] == durations[j] or new_list[i] < durations[j+1]:
-            correlation.append(new_list[i])
-            i = i+1
+
+times = [sorted(new_list + durations)]
+print(times)
