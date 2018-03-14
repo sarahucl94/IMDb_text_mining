@@ -9,10 +9,10 @@
 
 import numpy as np
 import scipy.io.wavfile
-from scipy.spatial.distance import euclidean
+import json
 import re
 import decimal
-from fastdtw import fastdtw
+
 
 
 with open("subs.txt", "r+") as file:
@@ -127,39 +127,35 @@ def duration(dvs_interval):
     return y
 
 durations = duration(dvs_interval)
-print(durations)
-
-# start_times = []
-# i = 0
-# for values in dvs_interval:
-#     while i < len(dvs_interval):
-#         start_times.append(dvs_interval[i])
-#         i += 2
-# print(start_times)
 
 
+start_times = []
+i = 0
+for values in dvs_interval:
+    while i < len(dvs_interval):
+        start_times.append(dvs_interval[i])
+        i += 2
+print(start_times)
 
-with open("data.txt",'r') as dvs_data:
+
+
+with open("data.json",'r') as dvs_data:
     with open('dvs_text_only.txt', 'w+') as simple_text:
-        for line in dvs_data.readlines():
-            dvs_text = ''.join(i for i in line if i.isalpha() or i == "'" or i == ' ' or i == '.')
-            dvs_text = dvs_text.replace("transcript", '')
-            dvs_text = dvs_text.replace("content", '')
-            dvs_text = dvs_text.replace("start", '')
-            dvs_text = dvs_text.replace('.', '\n')
-            simple_text.write(dvs_text)
+        dvs_txt = json.load(dvs_data)
+        for i in range(len(dvs_txt['transcript'])):
+            simple_text.write(dvs_txt['transcript'][i]['content']+'\n')
         simple_text.close()
 
 
-with open('data.txt', 'r+') as file:
-    for line in file.readlines():
-        dvs_num = ''.join(i for i in line if i.isdigit() or i == '.' or i == ' ')
-    numList = re.sub("[^\d.]", " ", dvs_num).split()
-    new_list=[]
-    for element in numList:
-        new_list.append(decimal.Decimal(element))
-    print(new_list)
+with open('data.json', 'r+') as file:
+    numList =[]
+    dvs_num = json.load(file)
+    for i in range(len(dvs_num['transcript'])):
+        numList.append(dvs_num['transcript'][i]['start'])
 
 
-times = [sorted(new_list + durations)]
-print(times)
+times = str(sorted(numList + durations))
+with open('final_times.json', 'w') as file:
+     file.write(times+ '\n')
+file.close()
+
