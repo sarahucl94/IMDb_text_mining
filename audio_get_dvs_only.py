@@ -28,7 +28,7 @@ with open("subs.txt", "r+") as file:
 # Modify subtitle file to adapt format for analysis
 # Remove characters that are not timings (eg. commas, dots, brakets)
 
-def new():
+def subs():
     with open("subs_part3_times.txt", "r+") as a:
         for line in a.read().split():
             timings = ''.join(i for i in line if not i==']' or not i=="'" or not i=='[')
@@ -45,7 +45,7 @@ def new():
     with open("subs_part3_times.txt", "w+") as a:
         a.write(timings)
         a.close()
-new()
+subs()
 
 
 # Open audio file for the movie- has to be in mono audio channel
